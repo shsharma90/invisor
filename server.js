@@ -26,7 +26,7 @@ io.on("connection", (socket) => {
       user_id: data.displayName,
       meeting_id: data.meetingid,
     });
-   
+
     var userCount = userConnections.length;
     console.log(userCount);
     other_users.forEach((v) => {
@@ -38,7 +38,7 @@ io.on("connection", (socket) => {
     });
     socket.emit("inform_me_about_other_user", other_users);
   });
-  socket.on("SDPProcess", (data) => {
+     socket.on("SDPProcess", (data) => {
     socket.to(data.to_connid).emit("SDPProcess", {
       message: data.message,
       from_connid: socket.id,
@@ -71,7 +71,7 @@ io.on("connection", (socket) => {
           username: msg.username,
           meetingid: msg.meetingid,
           filePath: msg.filePath,
-          fileName: msg.fileName,
+ fileName: msg.fileName,
         });
       });
     }
@@ -96,7 +96,7 @@ io.on("connection", (socket) => {
     }
   });
 
- 
+
   socket.on("sendHandRaise", function (data) {
     var senderID = userConnections.find((p) => p.connectionId == socket.id);
     console.log("senderID :", senderID.meeting_id);
@@ -107,7 +107,7 @@ io.on("connection", (socket) => {
       // );
       var list = userConnections.filter((p) => p.meeting_id == meetingid);
       list.forEach((v) => {
-        var userNumberAfUserLeave = userConnections.length;
+	 var userNumberAfUserLeave = userConnections.length;
         socket.to(v.connectionId).emit("HandRaise_info_for_others", {
           connId: socket.id,
           handRaise: data,
@@ -115,34 +115,35 @@ io.on("connection", (socket) => {
       });
     }
   });
- 
+
 });
 
-var mysql = require('mysql');
 var connection = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: "",
-  database: "database"
+  password: "password",
+  database: "meetdb"
   });
    connection.connect(function (err) {
-  if (err) throw err;
+         if (err){
+        console.log(err);
+         throw err
+        }
   // console.log('connected');
   })
   // app.set('view engine', 'ejs');
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
-  app.use(express.static('public'));
-
+  app.use(express.static(path.join(__dirname, 'public')));
   // app.get('/action',(req, res) => {
 
   // })
   app.post("/index", function (req, res) {
     user_id = req.body.user_id;
     // console.log(user_id);
-    var sql = "insert into user values(null , ' " + req.body.user_id + "' , null)"
+    var sql = "insert into user(user_id) values(' " + req.body.user_id + "')";
      connection.query(sql, function (err) {
-    if (err) throw err
+ if (err) throw err
   });
 });
 
@@ -168,3 +169,5 @@ app.post("/attachimg", function (req, res) {
     }
   );
 });
+
+
