@@ -161,8 +161,7 @@ var AppProcess = (function () {
             width: 1920 ,
                 height: 1080  
                 ,
-                
-                   facingMode: front ? "user" : "environment" 
+                 
                   },
               
           audio: false,
