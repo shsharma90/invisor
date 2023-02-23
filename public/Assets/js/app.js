@@ -160,7 +160,11 @@ var AppProcess = (function () {
           video: {
             width: 1920 ,
                 height: 1080  
-          },
+                ,
+                
+                   facingMode: front ? "user" : "environment" 
+                  },
+              
           audio: false,
         });
         vstream.oninactive = (e) => {
