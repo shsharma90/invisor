@@ -66,23 +66,6 @@ var AppProcess = (function () {
         await videoProcess(video_states.ScreenShare);
       }
     });
-
-    $("#flip-button").on("click" ,  async function () {
-      alert("flip camera");
-      if (video_st == front) {
-        await videoProcess({
-            video: {
-                facingMode: { exact: "user" }
-            }
-        })
-    } else {
-        await videoProcess({
-            video: {
-                facingMode: { exact: "environment" }
-            }
-        })
-    }
-    });
   }
 
   async function loadAudio() {
@@ -170,11 +153,9 @@ var AppProcess = (function () {
       if (newVideoState == video_states.Camera) {
         vstream = await navigator.mediaDevices.getUserMedia({
 
-          video: {
-            width: 1920,
-            height: 1080,
-            facingMode:  { facingMode: front ? "user" : "environment" }
-          },
+          video: 
+             { facingMode: front ? "user" : "environment" }
+          ,
 
           audio: false,
         });
@@ -485,18 +466,7 @@ var MyApp = (function () {
       $("#messages").append(div);
     });
   }
-  // function front(){
-  //   $("#flip-button").on("click", async function() {
-  //     console.log("abcde");
-
-  //     if(!front){
-  //       front = true;
-  //     } else {
-  //       front = false;
-  //     }
-  //     });
-
-  // }
+  
 
   function eventHandeling() {
 
