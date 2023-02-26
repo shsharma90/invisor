@@ -118,7 +118,7 @@ height: 600px;
 }
 video{
     border: 1px solid gray;
-    width: 300px;
+    /* width: 300px; */
     
 }
 .active{

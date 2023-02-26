@@ -6,6 +6,7 @@ var AppProcess = (function () {
   var local_div;
   var serverProcess;
   var audio;
+  var front = false;
   var isAudioMute = true;
   var rtp_aud_senders = [];
   var video_states = {
@@ -22,6 +23,7 @@ var AppProcess = (function () {
     eventProcess();
     local_div = document.getElementById("locaVideoPlayer");
   }
+
   function eventProcess() {
     $("#miceMuteUnmute").on("click", async function () {
       if (!audio) {
@@ -64,7 +66,25 @@ var AppProcess = (function () {
         await videoProcess(video_states.ScreenShare);
       }
     });
+
+    $("#flip-button").on("click" ,  async function () {
+      alert("flip camera");
+      if (video_st == front) {
+        await videoProcess({
+            video: {
+                facingMode: { exact: "user" }
+            }
+        })
+    } else {
+        await videoProcess({
+            video: {
+                facingMode: { exact: "environment" }
+            }
+        })
+    }
+    });
   }
+
   async function loadAudio() {
     try {
       var astream = await navigator.mediaDevices.getUserMedia({
@@ -130,14 +150,14 @@ var AppProcess = (function () {
 
       removeVideoStream(rtp_vid_senders);
       console.log("rtp_vid_senders", rtp_vid_senders);
-      
+
       serverProcess(
         JSON.stringify({
           Video_switch_off: "Video_switch_off",
         }),
         rtp_vid_senders
       );
-      
+
       return;
     }
     if (newVideoState == video_states.Camera) {
@@ -149,21 +169,22 @@ var AppProcess = (function () {
       var vstream = null;
       if (newVideoState == video_states.Camera) {
         vstream = await navigator.mediaDevices.getUserMedia({
+
           video: {
-            width: 1920 ,
-            height: 1080  
+            width: 1920,
+            height: 1080,
+            facingMode:  { facingMode: front ? "user" : "environment" }
           },
+
           audio: false,
         });
       } else if (newVideoState == video_states.ScreenShare) {
         vstream = await navigator.mediaDevices.getDisplayMedia({
-          video: {
-            width: 1920 ,
-                height: 1080  
-                ,
-                 
-                  },
-              
+          video: true,
+          // {
+          //   width: 1920 ,
+          //       height: 1080  
+          // },
           audio: false,
         });
         vstream.oninactive = (e) => {
@@ -204,10 +225,10 @@ var AppProcess = (function () {
   var iceConfiguration = {
     iceServers: [
       {
-        "urls": ["stun:stun.l.google.com:19302", 
-        "stun:stun1.l.google.com:19302", 
-        "stun:stun2.l.google.com:19302"]
-    }
+        "urls": ["stun:stun.l.google.com:19302",
+          "stun:stun1.l.google.com:19302",
+          "stun:stun2.l.google.com:19302"]
+      }
     ],
 
   };
@@ -390,7 +411,7 @@ var MyApp = (function () {
       $("#participant_" + data.connId + "").remove();
       AppProcess.closeConnectionCall(data.connId);
     });
-    
+
 
     socket.on("HandRaise_info_for_others", function (data) {
       if (data.handRaise) {
@@ -399,7 +420,7 @@ var MyApp = (function () {
         $("#hand_" + data.connId).hide();
       }
     });
-    
+
 
     socket.on("inform_others_about_me", function (data) {
       addUser(data.other_user_id, data.connId, data.userNumber);
@@ -455,17 +476,30 @@ var MyApp = (function () {
       });
       var div = $("<div>").html(
         "<span class='font-weight-bold mr-3' style='color:black'>" +
-          data.from +
-          "</span>" +
-          lTime +
-          "</br>" +
-          data.message
+        data.from +
+        "</span>" +
+        lTime +
+        "</br>" +
+        data.message
       );
       $("#messages").append(div);
     });
   }
+  // function front(){
+  //   $("#flip-button").on("click", async function() {
+  //     console.log("abcde");
+
+  //     if(!front){
+  //       front = true;
+  //     } else {
+  //       front = false;
+  //     }
+  //     });
+
+  // }
+
   function eventHandeling() {
-   
+
     var handRaise = false;
     $("#handRaiseAction").on("click", async function () {
       if (!handRaise) {
@@ -478,7 +512,7 @@ var MyApp = (function () {
         socket.emit("sendHandRaise", handRaise);
       }
     });
-    
+
     $("#btnsend").on("click", function () {
       var msgData = $("#msgbox").val();
       socket.emit("sendMessage", msgData);
@@ -490,11 +524,11 @@ var MyApp = (function () {
       });
       var div = $("<div>").html(
         "<span class='font-weight-bold mr-3' style='color:black'>" +
-          user_id +
-          "</span>" +
-          lTime +
-          "</br>" +
-          msgData
+        user_id +
+        "</span>" +
+        lTime +
+        "</br>" +
+        msgData
       );
       $("#messages").append(div);
       $("#msgbox").val("");
@@ -514,17 +548,17 @@ var MyApp = (function () {
     newDivId.find("h2").text(other_user_id);
     newDivId.find("video").attr("id", "v_" + connId);
     newDivId.find("audio").attr("id", "a_" + connId);
-    
+
     newDivId.find("img").attr("id", "hand_" + connId);
-  
+
     newDivId.show();
     $("#divUsers").append(newDivId);
     $(".in-call-wrap-up").append(
       '<div class="in-call-wrap d-flex justify-content-between align-items-center mb-3" id="participant_' +
-        connId +
-        '"> <div class="participant-img-name-wrap display-center cursor-pointer"> <div class="participant-img"> <img src="public/Assets/images/other.jpg" alt="" class="border border-secondary" style="height: 40px;width: 40px;border-radius: 50%;"> </div> <div class="participant-name ml-2"> ' +
-        other_user_id +
-        '</div> </div> <div class="participant-action-wrap display-center"> <div class="participant-action-dot display-center mr-2 cursor-pointer"> <span class="material-icons"> more_vert </span> </div> <div class="participant-action-pin display-center mr-2 cursor-pointer"> <span class="material-icons"> push_pin </span> </div> </div> </div>'
+      connId +
+      '"> <div class="participant-img-name-wrap display-center cursor-pointer"> <div class="participant-img"> <img src="public/Assets/images/other.jpg" alt="" class="border border-secondary" style="height: 40px;width: 40px;border-radius: 50%;"> </div> <div class="participant-name ml-2"> ' +
+      other_user_id +
+      '</div> </div> <div class="participant-action-wrap display-center"> <div class="participant-action-dot display-center mr-2 cursor-pointer"> <span class="material-icons"> more_vert </span> </div> <div class="participant-action-pin display-center mr-2 cursor-pointer"> <span class="material-icons"> push_pin </span> </div> </div> </div>'
     );
     $(".participant-count").text(userNum);
   }
