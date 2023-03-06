@@ -153,9 +153,8 @@ var AppProcess = (function () {
       if (newVideoState == video_states.Camera) {
         vstream = await navigator.mediaDevices.getUserMedia({
 
-          video: 
-             { facingMode: front ? "user" : "environment" }
-          ,
+          video: true,
+            
 
           audio: false,
         });
