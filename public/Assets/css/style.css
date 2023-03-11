@@ -119,7 +119,7 @@ height: 600px;
 video{
     border: 1px solid gray;
     width: 300px;
-    
+    display: flex;
 }
 .active{
     background-color: #00808047;

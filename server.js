@@ -121,8 +121,8 @@ io.on("connection", (socket) => {
 var connection = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: "password",
-  database: "meetdb"
+  password: "",
+  database: "database"
   });
    connection.connect(function (err) {
          if (err){
